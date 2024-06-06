@@ -17,9 +17,23 @@ def mode_selector():
     builder.button(text="Первичный ответ",
                    callback_data=ModeSelectCallback(type="mode", action="first_answer"))
     builder.button(text="Ошибка публикации",
-                   callback_data=ModeSelectCallback(type="mode", action="first_answer"))
+                   callback_data=ModeSelectCallback(type="mode", action="pub_error"))
     builder.button(text="ВДЛ",
                    callback_data=ModeSelectCallback(type="mode", action="VDL"))
+    builder.button(text="Аккаунты",
+                   callback_data=ModeSelectCallback(type="mode", action="auth"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def change_password():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Обновить пароль",
+                   callback_data=ModeSelectCallback(type="auth", action="change_password"))
+    builder.button(text="Добавить аккаунт",
+                   callback_data=ModeSelectCallback(type="auth", action="add_account"))
+    builder.button(text="Закрыть меню",
+                   callback_data=ModeSelectCallback(type="auth", action="close"))
 
     builder.adjust(1)
     return builder.as_markup()
