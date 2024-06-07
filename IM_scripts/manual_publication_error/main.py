@@ -3,6 +3,7 @@ import csv
 from IM_scripts.manual_publication_error.IM_api import GetIMdata
 from IM_scripts.auth.auth import GetAuth
 
+'''функция запуска и перебора всех стадий инцидента'''
 def start_handpub_error():
 
     stages = [3, 5, 6, 10]
@@ -10,12 +11,12 @@ def start_handpub_error():
     for stage in stages:
         time.sleep(2)
         res = unfinished_pub_get(stage)
-        res_inc.extend(res)
-    res_inc.sort()
+        if res:
+            res_inc.extend(res)
+            res_inc.sort()
+        break
 
-    #print('Завершил все стадии')
-    #pprint.pprint(res_inc)
-
+    #записываем текстовый файл, где все исполнители по алфавитному порядку
     with open('ошибка публикации.txt', 'w', newline='', encoding='utf-8') as csvfile:
 
         writer = csv.writer(csvfile)
@@ -25,26 +26,29 @@ def start_handpub_error():
 
     return res_inc
 
-
 def unfinished_pub_get(stage):
+    #авторизуемся и получаем токен
+
     auth = GetAuth()
     token = auth.check_token()
-    print("header////////", token)
-    get_data = GetIMdata()
-    data = get_data.get_inc(token, stage)
+    if token:
+        get_data = GetIMdata()
+        data = get_data.get_inc(token, stage)
 
-    all_inc = []
-    for i in range(len(data['results'])):
-        if data['results'][i]['last_response']["status"] == "UNFINISHED_PUBLICATION":
-            last_name = data['results'][i]["assigned_user_info"]["last_name"]
-            first_name = data['results'][i]["assigned_user_info"]["first_name"]
-            inc_id = data['results'][i]['id']
-            link = f'https://im.gosuslugi.ru/#/incidents/stage/{stage}?incident={inc_id}'
-            full_line = f'{last_name} {first_name}: {link}'
-            all_inc.append(full_line)
-        continue
+        #собираем список с названиями испольнителей и ссылками на карточку инцидента
 
-    return all_inc
+        all_inc = []
+        for i in range(len(data['results'])):
+            if data['results'][i]['last_response']["status"] == "UNFINISHED_PUBLICATION":
+                last_name = data['results'][i]["assigned_user_info"]["last_name"]
+                first_name = data['results'][i]["assigned_user_info"]["first_name"]
+                inc_id = data['results'][i]['id']
+                link = f'https://im.gosuslugi.ru/#/incidents/stage/{stage}?incident={inc_id}'
+                full_line = f'{last_name} {first_name}: {link}'
+                all_inc.append(full_line)
+            continue
+
+        return all_inc
 
 
 

@@ -4,12 +4,11 @@ import requests
 
 class GetAuth:
 
-    '''проверям есть ли валидный токен'''
+    '''проверям есть ли валидный токен в редисе'''
     def check_token(self):
         token = Redis.get_token()
         if token:
             return self.get_headers(token)
-
         else:
             return self.get_creds()
 
@@ -23,15 +22,18 @@ class GetAuth:
     def issue_token(self, username, password):
         url_token = 'https://im.gosuslugi.ru/api/token-auth/'
 
-        data = {"username": f'{username}', "password": f'{password}'}
-        response = requests.post(url_token, data=data)
-        token_data = json.loads(response.text)
-        print(token_data)
-        token = token_data['access']['token']
-        Redis.set_token(token)
-        headers = self.get_headers(token)
+        try:
+            data = {"username": f'{username}', "password": f'{password}'}
+            response = requests.post(url_token, data=data)
+            token_data = json.loads(response.text)
+            token = token_data['access']['token']
+            #записываем токен для переиспользования
+            Redis.set_token(token)
+            headers = self.get_headers(token)
+            return headers
 
-        return headers
+        except KeyError:
+            return False
 
 
     '''получаем заголовки вместе с токеном'''

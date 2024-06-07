@@ -5,7 +5,7 @@ class RedisCheck:
     def __init__(self, host='localhost', port=6379, decode_responses=True):
        self.r = redis.Redis(host=host, port=port, decode_responses=decode_responses)
 
-    '''получаем пароль от аккаунта Медиалогии'''
+    '''получаем пароль от аккаунта Медиалогии (заранее добавлен по умолчанию через redis-cli)'''
     def get_creds(self, key="intern3"):
        try:
             creds = []
@@ -22,7 +22,7 @@ class RedisCheck:
     def get_token(self, key="token"):
         try:
            if self.r.exists(key):
-               print('Токен уже есть!')
+               #print('Токен уже есть!')
                token = self.r.get(key)
                return token
 
@@ -38,7 +38,6 @@ class RedisCheck:
         except redis.exceptions.ConnectionError as e:
             logging.error('Ошибка redis_conf:', e)
             return False
-
 
 
 rc = RedisCheck()

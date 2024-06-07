@@ -1,6 +1,5 @@
 import asyncio
 import logging
-
 from dotenv import load_dotenv
 import os
 from aiogram import Bot, Dispatcher
@@ -28,7 +27,6 @@ storage = MemoryStorage()
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
 
-
 '''класс состояний'''
 class Form(StatesGroup):
     mode = State()
@@ -42,7 +40,6 @@ def user_check(chat_member):
         return False
 
 '''хэндлер на команду /start'''
-
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     if user_check(await bot.get_chat_member(chat_id=GROUP, user_id=message.from_user.id)):
@@ -54,11 +51,16 @@ async def cmd_start(message: types.Message):
 async def expert_btn_select_action(callback: types.CallbackQuery, callback_data: ModeSelectCallback, state: FSMContext):
 
     if callback_data.action == 'pub_error':
+
         result = start_handpub_error()
-        data = len(result)
-        document = FSInputFile('ошибка публикации.txt')
-        await bot.send_message(callback.message.chat.id, text=f'Количество инцидентов с ошибкой публикации: {data}')
-        await bot.send_document(callback.message.chat.id, document)
+        if result:
+            data = len(result)
+            document = FSInputFile('ошибка публикации.txt')
+            await bot.send_message(callback.message.chat.id, text='Процесс пошел. Это может занять некоторое время...')
+            await bot.send_message(callback.message.chat.id, text=f'Количество инцидентов с ошибкой публикации: {data}')
+            await bot.send_document(callback.message.chat.id, document)
+        else:
+            await bot.send_message(callback.message.chat.id, text=f'Проблемы с авторизацией, обновите пароль для аккаунта')
 
 
 async def main():
