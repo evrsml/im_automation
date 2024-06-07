@@ -6,7 +6,6 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.filters.command import Command
 from aiogram import F
-from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -14,8 +13,7 @@ from aiogram import types
 from aiogram.types import FSInputFile
 from keyboard import mode_selector, ModeSelectCallback
 
-
-from IM_scripts.manual_publication_error.main import token_keeper
+from IM_scripts.manual_publication_error.main import start_handpub_error
 
 
 logging.basicConfig(level=logging.INFO)
@@ -56,7 +54,7 @@ async def cmd_start(message: types.Message):
 async def expert_btn_select_action(callback: types.CallbackQuery, callback_data: ModeSelectCallback, state: FSMContext):
 
     if callback_data.action == 'pub_error':
-        result = token_keeper()
+        result = start_handpub_error()
         data = len(result)
         document = FSInputFile('ошибка публикации.txt')
         await bot.send_message(callback.message.chat.id, text=f'Количество инцидентов с ошибкой публикации: {data}')

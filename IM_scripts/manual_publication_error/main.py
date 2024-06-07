@@ -1,14 +1,9 @@
-import pickle
-import pprint
 import time
 import csv
-from IM_scripts.manual_publication_error.IM_api import GetToken, GetIMdata
+from IM_scripts.manual_publication_error.IM_api import GetIMdata
+from IM_scripts.auth.auth import GetAuth
 
-def token_keeper():
-    get_token = GetToken("rbintern.03@gmail.com", "p3XpbBVi")
-    token = get_token.get_token()
-    with open('token.pickle', 'wb') as f:
-        pickle.dump(token, f)
+def start_handpub_error():
 
     stages = [3, 5, 6, 10]
     res_inc = []
@@ -32,9 +27,9 @@ def token_keeper():
 
 
 def unfinished_pub_get(stage):
-    with open('token.pickle', 'rb') as f:
-        token = pickle.load(f)
-
+    auth = GetAuth()
+    token = auth.check_token()
+    print("header////////", token)
     get_data = GetIMdata()
     data = get_data.get_inc(token, stage)
 
