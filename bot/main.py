@@ -11,7 +11,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import types
+from aiogram.types import FSInputFile
 from keyboard import mode_selector, ModeSelectCallback
+
 
 from IM_scripts.manual_publication_error.main import token_keeper
 
@@ -55,7 +57,10 @@ async def expert_btn_select_action(callback: types.CallbackQuery, callback_data:
 
     if callback_data.action == 'pub_error':
         result = token_keeper()
-        await bot.send_message(callback.message.chat.id, text=result)
+        data = len(result)
+        document = FSInputFile('ошибка публикации.txt')
+        await bot.send_message(callback.message.chat.id, text=f'Количество инцидентов с ошибкой публикации: {data}')
+        await bot.send_document(callback.message.chat.id, document)
 
 
 async def main():

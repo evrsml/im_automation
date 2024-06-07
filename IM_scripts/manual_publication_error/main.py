@@ -21,13 +21,15 @@ def token_keeper():
     print('Завершил все стадии')
     pprint.pprint(res_inc)
 
-    with open('ошибка публикации.csv', 'w', newline='', encoding='utf-8') as csvfile:
+    with open('ошибка публикации.txt', 'w', newline='', encoding='utf-8') as csvfile:
 
         writer = csv.writer(csvfile)
 
-
         for element in res_inc:
             writer.writerow([element])
+
+    return res_inc
+
 
 def unfinished_pub_get(stage):
     with open('token.pickle', 'rb') as f:
