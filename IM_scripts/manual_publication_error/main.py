@@ -18,8 +18,8 @@ def token_keeper():
         res_inc.extend(res)
     res_inc.sort()
 
-    print('Завершил все стадии')
-    pprint.pprint(res_inc)
+    #print('Завершил все стадии')
+    #pprint.pprint(res_inc)
 
     with open('ошибка публикации.txt', 'w', newline='', encoding='utf-8') as csvfile:
 

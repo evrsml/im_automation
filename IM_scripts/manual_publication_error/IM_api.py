@@ -31,7 +31,7 @@ class GetIMdata():
             response = requests.get(base_url, headers=token)
             data = json.loads(response.text)
             inc_count = data['count']
-            print(inc_count)
+            #print(inc_count)
             current_url = f'https://im.gosuslugi.ru/api/inc/incidents/?offset=0&limit={inc_count}&ordering=-current_stage_term&current_stage={stage}&personal=64452&workflow=322'
             response = requests.get(current_url, headers=token)
             data = json.loads(response.text)
