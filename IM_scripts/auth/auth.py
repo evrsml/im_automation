@@ -35,7 +35,6 @@ class GetAuth:
         except KeyError:
             return False
 
-
     '''получаем заголовки вместе с токеном'''
 
     def get_headers(self, token):

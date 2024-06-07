@@ -30,7 +30,7 @@ class RedisCheck:
             logging.error('Ошибка redis_conf:', e)
 
     '''записываем токен в редис с TTL ~ 2 часа'''
-    def set_token(self,value, key="token"):
+    def set_token(self, value, key="token"):
         try:
             self.r.set(key, value, ex=7000)
             return True
@@ -39,5 +39,13 @@ class RedisCheck:
             logging.error('Ошибка redis_conf:', e)
             return False
 
+    '''обновляем пароль в базе редиса'''
+    def update_password(self, new_password, name="intern3"):
+        try:
+            self.r.lset(name,1, new_password)
+            return True
+        except redis.exceptions.ConnectionError as e:
+            logging.error('Ошибка redis_conf:', e)
+            return False
 
 rc = RedisCheck()
