@@ -1,6 +1,6 @@
 import requests
 import json
-
+import logging
 
 '''класс для запросов к ИМ'''
 class GetIMdata():
@@ -19,7 +19,8 @@ class GetIMdata():
             return data
 
         except KeyError:
-            return data
+            logging.error("Ошибка авторизации", data)
+
 
 
 
