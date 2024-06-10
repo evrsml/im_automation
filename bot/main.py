@@ -63,11 +63,11 @@ async def expert_btn_select_action(callback: types.CallbackQuery, callback_data:
         if result:
             data = len(result)
             document = FSInputFile('ошибка публикации.txt')
-            await bot.send_message(callback.message.chat.id, text='Процесс пошел...\nЭто может занять некоторое время')
-            await bot.send_message(callback.message.chat.id, text=f'Количество инцидентов с ошибкой публикации: {data}')
+            await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
+            await bot.send_message(callback.message.chat.id, text=f'✅ Количество инцидентов с ошибкой публикации: {data}')
             await bot.send_document(callback.message.chat.id, document)
         else:
-            await bot.send_message(callback.message.chat.id, text=f'Проблемы с авторизацией, обновите пароль для аккаунта')
+            await bot.send_message(callback.message.chat.id, text=f'❌ Проблемы с авторизацией, обновите пароль для аккаунта')
 
     if callback_data.action == 'auth':
         await bot.send_message(callback.message.chat.id, text='Что сделать?',
@@ -89,15 +89,18 @@ async def auth_management(callback: types.CallbackQuery, callback_data: ModeSele
 
         if redis.update_password(new_password=data['password']):
             await bot.send_message(callback.message.chat.id,
-                                   text='Пароль успешно обновлен!',
+                                   text='✅ Пароль успешно обновлен!\nНеобходимо перезапустить бота',
                                    reply_markup=mode_selector())
             await state.clear()
 
         else:
             await bot.send_message(callback.message.chat.id,
-                                   text='Произошла ошибка, попробуйте еще раз')
+                                   text='❌ Произошла ошибка, попробуйте еще раз')
             await state.clear()
 
+    if callback_data.action == 'close':
+
+            await bot.delete_message(callback.message.chat.id, message_id=callback.message.message_id)
 
 async def main():
     await dp.start_polling(bot, skip_updates=True)

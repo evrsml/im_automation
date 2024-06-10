@@ -20,7 +20,7 @@ def mode_selector():
                    callback_data=ModeSelectCallback(type="mode", action="pub_error"))
     builder.button(text="ВДЛ",
                    callback_data=ModeSelectCallback(type="mode", action="VDL"))
-    builder.button(text="Аккаунты",
+    builder.button(text="🔑 Аккаунты и авторизация",
                    callback_data=ModeSelectCallback(type="mode", action="auth"))
     builder.adjust(1)
     return builder.as_markup()
@@ -33,7 +33,7 @@ def change_password():
                    callback_data=ModeSelectCallback(type="auth", action="add_account"))
     builder.button(text="Закрыть меню",
                    callback_data=ModeSelectCallback(type="auth", action="close"))
-    builder.adjust(1)
+
     return builder.as_markup()
 
 def pass_approve():
