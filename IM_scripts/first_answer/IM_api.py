@@ -21,7 +21,9 @@ class GetIMdata():
             #print(data)
             return data
         except KeyError:
-            logging.error("Ошибка авторизации", data)
+            logging.error("Ошибка авторизации")
+            return KeyError
+
 
     '''формируем данные для настройки публикации'''
     def publication_setup(self, data):

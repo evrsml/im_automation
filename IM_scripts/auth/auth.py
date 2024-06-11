@@ -2,6 +2,10 @@ from redis_conf.config import rc as Redis
 import json
 import requests
 
+
+class TokenError(Exception):
+    pass
+
 class GetAuth:
 
     '''проверям есть ли валидный токен в редисе'''
@@ -10,12 +14,17 @@ class GetAuth:
         if token:
             return self.get_headers(token)
         else:
-            return self.get_creds()
+            print("запускаем get_creds")
+            try:
+                return self.get_creds()
+            except TokenError:
+                return False
 
     '''получаем данные для авторизации'''
 
     def get_creds(self):
         creds = Redis.get_creds()
+        print(creds)
         self.issue_token(creds[0], creds[1])
 
     '''получаем токен и заголовки для запросов к API'''
@@ -30,10 +39,13 @@ class GetAuth:
             #записываем токен для переиспользования
             Redis.set_token(token)
             headers = self.get_headers(token)
+            print(token)
+            print(token_data)
             return headers
 
         except KeyError:
-            return False
+            raise TokenError
+
 
     '''получаем заголовки вместе с токеном'''
 

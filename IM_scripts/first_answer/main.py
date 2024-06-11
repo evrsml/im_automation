@@ -1,42 +1,38 @@
 import pickle
 import time
 import csv
-from IM_api import GetToken, GetIMdata
-from VK_api import comment_link_parse
+from IM_scripts.auth.auth import GetAuth
+from IM_scripts.first_answer.IM_api import GetIMdata
+from IM_scripts.first_answer.VK_api import comment_link_parse
 
-def token_keeper():
-    get_token = GetToken("rbintern.03@gmail.com", "p3XpbBVi")
-    token = get_token.get_token()
-    with open('token.pickle', 'wb') as f:
-        pickle.dump(token, f)
+def start_first_answer():
 
-    ids_links_getter()
+    auth = GetAuth()
+    token = auth.check_token()
+    if token:
+        get_im = GetIMdata()
+        data = get_im.get_inc_without_answers(token)
 
-def ids_links_getter():
-    with open('token.pickle', 'rb') as f:
-        token = pickle.load(f)
 
-    get_im = GetIMdata()
+        inc_ids = []
+        urls = []
 
-    data = get_im.get_inc_without_answers(token)
+        for i in range(len(data['results'])):
+            id = data['results'][i]["id"]
+            #print(id)
+            url = data['results'][i]['source_post']['url']
+            #print(url)
+            if id not in inc_ids and url not in urls:
+                inc_ids.append(id)
+                urls.append(url)
+            else:
+                continue
+        print('Количество инцидентов без ответа:', len(inc_ids))
+        print('Поиск ответов в комментариях...')
 
-    inc_ids = []
-    urls = []
+        return selector(inc_ids, urls, token)
 
-    for i in range(len(data['results'])):
-        id = data['results'][i]["id"]
-        #print(id)
-        url = data['results'][i]['source_post']['url']
-        #print(url)
-        if id not in inc_ids and url not in urls:
-            inc_ids.append(id)
-            urls.append(url)
-        else:
-            continue
-    print('Количество инцидентов без ответа:', len(inc_ids))
-    print('Поиск ответов в комментариях...')
 
-    return selector(inc_ids, urls, token)
 
 def selector(inc_ids, urls, token):
     url_report = []
@@ -54,7 +50,10 @@ def selector(inc_ids, urls, token):
     print('Все ответы проведены!\nКоличество первичек проведено:', len(url_report))
     print(url_report)
 
-    with open('отчет по первичным ответам.csv', 'w', newline='', encoding='utf-8') as csvfile:
+    stats = f'Все ответы проведены!\nКоличество первичек проведено: {len(url_report)}'
+
+
+    with open('отчет по первичным ответам.txt', 'w', newline='', encoding='utf-8') as csvfile:
         # Create a CSV writer object
         writer = csv.writer(csvfile)
 
@@ -62,5 +61,4 @@ def selector(inc_ids, urls, token):
         for element in url_report:
             writer.writerow([element])
 
-
-token_keeper()
+    return stats

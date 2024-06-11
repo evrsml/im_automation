@@ -12,6 +12,8 @@ from aiogram import types
 from aiogram.types import FSInputFile
 from keyboard import mode_selector, ModeSelectCallback, pass_approve, change_password
 from IM_scripts.manual_publication_error.main import start_handpub_error
+from IM_scripts.first_answer.main import start_first_answer
+from IM_scripts.auth.auth import GetAuth
 from redis_conf.config import RedisCheck as Redis
 
 logging.basicConfig(level=logging.INFO)
@@ -54,18 +56,27 @@ async def get_new_password(message: types.Message, state: FSMContext):
     await message.answer(text="Вы уверены, что хотите изменить пароль?", reply_markup=pass_approve())
 
 @dp.callback_query(ModeSelectCallback.filter(F.type == 'mode'))
-async def expert_btn_select_action(callback: types.CallbackQuery, callback_data: ModeSelectCallback):
+async def mode_btn_select_action(callback: types.CallbackQuery, callback_data: ModeSelectCallback):
 
     if callback_data.action == 'pub_error':
 
-        result = start_handpub_error()
+        auth = GetAuth()
+        auth.check_token()
 
-        if result:
+        token = auth.check_token()
+
+        print(token)
+        if token:
+
+            result = start_handpub_error(token)
+
             data = len(result)
             document = FSInputFile('ошибка публикации.txt')
             await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
             await bot.send_message(callback.message.chat.id, text=f'✅ Количество инцидентов с ошибкой публикации: {data}')
-            await bot.send_document(callback.message.chat.id, document)
+
+            if document is not None:
+                await bot.send_document(callback.message.chat.id, document)
         else:
             await bot.send_message(callback.message.chat.id, text=f'❌ Проблемы с авторизацией, обновите пароль для аккаунта')
 
@@ -73,6 +84,24 @@ async def expert_btn_select_action(callback: types.CallbackQuery, callback_data:
         await bot.send_message(callback.message.chat.id, text='Что сделать?',
                                reply_markup=change_password())
 
+
+    if callback_data.action == 'first_answer':
+
+        await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
+
+        result = start_first_answer()
+
+        if result:
+
+            document = FSInputFile('отчет по первичным ответам.txt')
+            await bot.send_message(callback.message.chat.id,
+                                   text=result)
+            if document is not None:
+                await bot.send_document(callback.message.chat.id, document)
+
+        else:
+            await bot.send_message(callback.message.chat.id,
+                               text=f'❌ Проблемы с авторизацией, обновите пароль для аккаунта')
 @dp.callback_query(ModeSelectCallback.filter(F.type == 'auth'))
 async def auth_management(callback: types.CallbackQuery, callback_data: ModeSelectCallback, state: FSMContext):
 
