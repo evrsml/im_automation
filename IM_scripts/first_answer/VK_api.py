@@ -1,4 +1,4 @@
-from id_list import gospublic_list
+from IM_scripts.first_answer.id_list import gospublic_list
 import json
 import requests
 import re
