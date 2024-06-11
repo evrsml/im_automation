@@ -24,11 +24,11 @@ class RedisCheck:
     def get_token(self, key="token"):
         try:
            if self.r.exists(key):
-               print('Токен уже есть!')
+               #print('Токен уже есть!')
                token = self.r.get(key)
                return token
            else:
-                print("Токена нет")
+                #print("Токена нет")
                 return False
 
 

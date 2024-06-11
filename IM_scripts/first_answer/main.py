@@ -16,19 +16,18 @@ def start_first_answer(token):
 
     for i in range(len(data['results'])):
         id = data['results'][i]["id"]
-        #print(id)
         url = data['results'][i]['source_post']['url']
-        #print(url)
+
         if id not in inc_ids and url not in urls:
             inc_ids.append(id)
             urls.append(url)
         else:
             continue
-    print('Количество инцидентов без ответа:', len(inc_ids))
-    print('Поиск ответов в комментариях...')
+
+    #print('Количество инцидентов без ответа:', len(inc_ids))
+    #print('Поиск ответов в комментариях...')
 
     return selector(inc_ids, urls, token)
-
 
 
 def selector(inc_ids, urls, token):
@@ -44,8 +43,8 @@ def selector(inc_ids, urls, token):
         continue
         #print('Пропускаем инц')
 
-    print('Все ответы проведены!\nКоличество первичек проведено:', len(url_report))
-    print(url_report)
+    #print('Все ответы проведены!\nКоличество первичек проведено:', len(url_report))
+    #print(url_report)
 
     stats = f'Все ответы проведены!\nКоличество первичек проведено: {len(url_report)}'
 

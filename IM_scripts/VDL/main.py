@@ -15,7 +15,6 @@ def start_vdl(token):
     total = sum(inc_done)
     return f"✅ Всего инцидентов обработано: {total}"
 
-''''''
 
 def inc_loop(stage, token):
 

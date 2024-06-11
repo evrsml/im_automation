@@ -110,7 +110,7 @@ class GetIMdata():
             post_publish_url = f'https://im.gosuslugi.ru/api/inc/incidents/{inc_num}/publish/'
             payload_post_publish = {"check_updated":0}
             payload_post_publish["check_updated"] = data['updated']
-            resp = requests.post(url=post_publish_url, json=payload_post_publish, headers=token)
+            requests.post(url=post_publish_url, json=payload_post_publish, headers=token)
             #print("POST 4", resp.status_code)
 
             get_url = f'https://im.gosuslugi.ru/api/inc/incidents/{inc_num}'
@@ -129,7 +129,7 @@ class GetIMdata():
             #print("PATCH 5", resp.status_code)
 
             payload_patch["check_updated"] = patch_data_5["updated"]
-            resp = requests.patch(url=patch_resp_url, json=payload_patch, headers=token)
+            requests.patch(url=patch_resp_url, json=payload_patch, headers=token)
             #print("PATCH 6", resp.status_code)
 
             put_url = f'https://im.gosuslugi.ru/api/inc/incidents/{inc_num}/'
@@ -144,7 +144,7 @@ class GetIMdata():
             post_url_approve = f'https://im.gosuslugi.ru/api/inc/incidents/{inc_num}/approve/'
             payload_post_appove = {"check_updated":"2024-02-22T13:22:11.126976Z"}
             payload_post_appove["check_updated"] = put_data["updated"]
-            resp = requests.post(url=post_url_approve, json=payload_post_appove, headers=token)
+            requests.post(url=post_url_approve, json=payload_post_appove, headers=token)
             #print("POST 8", resp.status_code)
             time.sleep(4)
 
@@ -166,9 +166,9 @@ class GetIMdata():
 
             #print("PATCH 10", response_patch.status_code)
             if response_patch.status_code == 206:
-                print("Ответ проведен успешно! Пошел искать следующий...")
+                logging.info("Ответ проведен успешно! Пошел искать следующий...")
             else:
-                print("Произошла ошибка при закрытии ручной публикации")
+                logging.error("Произошла ошибка при закрытии ручной публикации")
 
         except Exception as e:
             logging.error("Произошла ошибка при проведении ответа", e)
