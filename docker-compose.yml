@@ -1,0 +1,18 @@
+services:
+  im_bot:
+    build:
+        context: /usr/local/bin/IM_auto_telegram
+    restart: always
+    volumes:
+      - /usr/local/bin/IM_auto_telegram:/app
+    depends_on:
+      - redis_im_bot
+    logging:
+      driver: journald
+      options:
+        tag: im_bot  
+
+  redis_im_bot:
+    image: redis:6.2.12-bullseye
+    restart: always
+
