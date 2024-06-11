@@ -5,32 +5,29 @@ from IM_scripts.auth.auth import GetAuth
 from IM_scripts.first_answer.IM_api import GetIMdata
 from IM_scripts.first_answer.VK_api import comment_link_parse
 
-def start_first_answer():
+def start_first_answer(token):
 
-    auth = GetAuth()
-    token = auth.check_token()
-    if token:
-        get_im = GetIMdata()
-        data = get_im.get_inc_without_answers(token)
+    get_im = GetIMdata()
+    data = get_im.get_inc_without_answers(token)
 
 
-        inc_ids = []
-        urls = []
+    inc_ids = []
+    urls = []
 
-        for i in range(len(data['results'])):
-            id = data['results'][i]["id"]
-            #print(id)
-            url = data['results'][i]['source_post']['url']
-            #print(url)
-            if id not in inc_ids and url not in urls:
-                inc_ids.append(id)
-                urls.append(url)
-            else:
-                continue
-        print('Количество инцидентов без ответа:', len(inc_ids))
-        print('Поиск ответов в комментариях...')
+    for i in range(len(data['results'])):
+        id = data['results'][i]["id"]
+        #print(id)
+        url = data['results'][i]['source_post']['url']
+        #print(url)
+        if id not in inc_ids and url not in urls:
+            inc_ids.append(id)
+            urls.append(url)
+        else:
+            continue
+    print('Количество инцидентов без ответа:', len(inc_ids))
+    print('Поиск ответов в комментариях...')
 
-        return selector(inc_ids, urls, token)
+    return selector(inc_ids, urls, token)
 
 
 

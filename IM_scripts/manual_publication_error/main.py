@@ -26,7 +26,6 @@ def start_handpub_error(token):
 
     return res_inc
 
-
 def unfinished_pub_get(stage, token):
     #авторизуемся и получаем токен
 

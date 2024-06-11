@@ -13,6 +13,7 @@ from aiogram.types import FSInputFile
 from keyboard import mode_selector, ModeSelectCallback, pass_approve, change_password
 from IM_scripts.manual_publication_error.main import start_handpub_error
 from IM_scripts.first_answer.main import start_first_answer
+from IM_scripts.VDL.main import start_vdl
 from IM_scripts.auth.auth import GetAuth
 from redis_conf.config import RedisCheck as Redis
 
@@ -41,7 +42,7 @@ def user_check(chat_member):
     else:
         return False
 
-'''хэндлер на команду /start'''
+'''обработчик на команду /start'''
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     if user_check(await bot.get_chat_member(chat_id=GROUP, user_id=message.from_user.id)):
@@ -49,27 +50,30 @@ async def cmd_start(message: types.Message):
     else:
         await bot.send_message(message.from_user.id, text='У вас нет доступа')
 
+'''обработчик нового пароля'''
 @dp.message(Form.auth, F.text)
 async def get_new_password(message: types.Message, state: FSMContext):
 
     await state.update_data(password=message.text)
     await message.answer(text="Вы уверены, что хотите изменить пароль?", reply_markup=pass_approve())
 
+'''обработка коллбэков для меню выбора режимов автоматизации'''
 @dp.callback_query(ModeSelectCallback.filter(F.type == 'mode'))
 async def mode_btn_select_action(callback: types.CallbackQuery, callback_data: ModeSelectCallback):
 
+    '''скрипт проверки ошибки публикации'''
+
     if callback_data.action == 'pub_error':
+
+        '''блок проверки авторизации'''
 
         auth = GetAuth()
         auth.check_token()
 
         token = auth.check_token()
 
-        print(token)
         if token:
-
             result = start_handpub_error(token)
-
             data = len(result)
             document = FSInputFile('ошибка публикации.txt')
             await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
@@ -84,15 +88,21 @@ async def mode_btn_select_action(callback: types.CallbackQuery, callback_data: M
         await bot.send_message(callback.message.chat.id, text='Что сделать?',
                                reply_markup=change_password())
 
+    '''скрипт для проведения первичного ответа'''
 
     if callback_data.action == 'first_answer':
 
+        '''блок проверки авторизации'''
+
+        auth = GetAuth()
+        auth.check_token()
+
+        token = auth.check_token()
+
         await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
 
-        result = start_first_answer()
-
-        if result:
-
+        if token:
+            result = start_first_answer(token)
             document = FSInputFile('отчет по первичным ответам.txt')
             await bot.send_message(callback.message.chat.id,
                                    text=result)
@@ -102,6 +112,30 @@ async def mode_btn_select_action(callback: types.CallbackQuery, callback_data: M
         else:
             await bot.send_message(callback.message.chat.id,
                                text=f'❌ Проблемы с авторизацией, обновите пароль для аккаунта')
+
+    '''скрпипт для заполнения поля источник ВДЛ ВК в карточке инцидента'''
+
+    if callback_data.action == 'VDL':
+
+        '''блок проверки авторизации'''
+
+        auth = GetAuth()
+        auth.check_token()
+
+        token = auth.check_token()
+
+        await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
+
+        if token:
+
+            result = start_vdl(token)
+            await bot.send_message(callback.message.chat.id,
+                                   text=result)
+        else:
+            await bot.send_message(callback.message.chat.id,
+                                   text=f'❌ Проблемы с авторизацией, обновите пароль для аккаунта')
+
+'''обработчик коллбэков для меню авторизации'''
 @dp.callback_query(ModeSelectCallback.filter(F.type == 'auth'))
 async def auth_management(callback: types.CallbackQuery, callback_data: ModeSelectCallback, state: FSMContext):
 
