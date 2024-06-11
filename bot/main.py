@@ -10,7 +10,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram import types
 from aiogram.types import FSInputFile
-from keyboard import mode_selector, ModeSelectCallback, pass_approve, change_password
+from keyboard import mode_selector, ModeSelectCallback, pass_approve, change_password, close
 from IM_scripts.manual_publication_error.main import start_handpub_error
 from IM_scripts.first_answer.main import start_first_answer
 from IM_scripts.VDL.main import start_vdl
@@ -29,11 +29,13 @@ storage = MemoryStorage()
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
 
+
 '''класс состояний'''
 class Form(StatesGroup):
     mode = State()
     auth = State()
     password = State()
+
 
 '''авторизация пользователя'''
 def user_check(chat_member):
@@ -41,6 +43,7 @@ def user_check(chat_member):
         return True
     else:
         return False
+
 
 '''обработчик на команду /start'''
 @dp.message(Command("start"))
@@ -50,12 +53,14 @@ async def cmd_start(message: types.Message):
     else:
         await bot.send_message(message.from_user.id, text='У вас нет доступа')
 
+
 '''обработчик нового пароля'''
 @dp.message(Form.auth, F.text)
 async def get_new_password(message: types.Message, state: FSMContext):
 
     await state.update_data(password=message.text)
     await message.answer(text="Вы уверены, что хотите изменить пароль?", reply_markup=pass_approve())
+
 
 '''обработка коллбэков для меню выбора режимов автоматизации'''
 @dp.callback_query(ModeSelectCallback.filter(F.type == 'mode'))
@@ -127,7 +132,6 @@ async def mode_btn_select_action(callback: types.CallbackQuery, callback_data: M
         await bot.send_message(callback.message.chat.id, text='⏳ Процесс пошел...\nЭто может занять некоторое время')
 
         if token:
-
             result = start_vdl(token)
             await bot.send_message(callback.message.chat.id,
                                    text=result)
@@ -142,7 +146,7 @@ async def auth_management(callback: types.CallbackQuery, callback_data: ModeSele
     if callback_data.action == 'change_password':
 
         await state.set_state(Form.auth)
-        await bot.send_message(callback.message.chat.id, text='Отправьте новый пароль для пользователя rbintern.03@gmail.com')
+        await bot.send_message(callback.message.chat.id, text='Отправьте новый пароль для пользователя rbintern.03@gmail.com', reply_markup=close())
 
     if callback_data.action == 'approve':
 
@@ -152,7 +156,7 @@ async def auth_management(callback: types.CallbackQuery, callback_data: ModeSele
 
         if redis.update_password(new_password=data['password']):
             await bot.send_message(callback.message.chat.id,
-                                   text='✅ Пароль успешно обновлен!\nНеобходимо перезапустить бота',
+                                   text='✅ Пароль успешно обновлен!',
                                    reply_markup=mode_selector())
             await state.clear()
 
@@ -163,7 +167,13 @@ async def auth_management(callback: types.CallbackQuery, callback_data: ModeSele
 
     if callback_data.action == 'close':
 
-            await bot.delete_message(callback.message.chat.id, message_id=callback.message.message_id)
+        await bot.delete_message(callback.message.chat.id, message_id=callback.message.message_id)
+        await state.clear()
+
+
+    if callback_data.action == 'add_account':
+
+        await bot.send_message(callback.message.chat.id, text="🔜 Функция добавления дополнительного аккаунта пока в разработке", reply_markup=close())
 
 async def main():
     await dp.start_polling(bot, skip_updates=True)

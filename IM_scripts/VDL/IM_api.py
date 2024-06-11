@@ -22,10 +22,9 @@ class GetIMdata():
 
             response = requests.put(url, json=data, headers=token)
             if response.status_code == 200:
-                print(f'Успешно обновил инцидент:{number}')
+                pass
             else:
-                print(f'Ошибка при обновлении инцидента: {number}')
-                print(response.status_code)
+                return f'❌ Ошибка обновления карточки'
 
 
 

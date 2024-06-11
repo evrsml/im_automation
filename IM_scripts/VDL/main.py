@@ -4,6 +4,7 @@ from IM_scripts.VDL.IM_api import GetIMdata
 
 inc_done = []
 
+'''стартовый скрипт, просматривает три стадии инцидента'''
 def start_vdl(token):
 
     stages = [3, 5, 10]
@@ -13,6 +14,8 @@ def start_vdl(token):
 
     total = sum(inc_done)
     return f"✅ Всего инцидентов обработано: {total}"
+
+''''''
 
 def inc_loop(stage, token):
 

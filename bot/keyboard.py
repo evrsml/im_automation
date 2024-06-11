@@ -25,6 +25,8 @@ def mode_selector():
     builder.adjust(1)
     return builder.as_markup()
 
+
+'''клавиатура для работы с авторизацией'''
 def change_password():
     builder = InlineKeyboardBuilder()
     builder.button(text="Обновить пароль",
@@ -42,5 +44,12 @@ def pass_approve():
                    callback_data=ModeSelectCallback(type="auth", action="approve"))
     builder.button(text="Нет, оставить старый пароль",
                    callback_data=ModeSelectCallback(type="auth", action="cancel"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+def close():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Закрыть меню",
+                   callback_data=ModeSelectCallback(type="auth", action="close"))
     builder.adjust(1)
     return builder.as_markup()
